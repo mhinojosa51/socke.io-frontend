@@ -10,10 +10,10 @@ class Chat extends React.Component {
 	}
 
 	componentDidMount(){
-		this.socket = io('http://localhost:3000');
+//		this.socket = io('http://localhost:3000');
 
-		console.log(this.socket);
-		this.socket.emit('loaded', {'name' : 'Mike'});
+	//	console.log(this.socket);
+	//	this.socket.emit('loaded', {'name' : 'Mike'});
 	}
 
 	render(){
