@@ -19,10 +19,10 @@ class Dashboard extends React.Component {
 	render(){
 		return (
 			<div style={styles.container}>
+				<SharedCanvas />
 				<UsersColumn>
 					<User name="Mike" />
 				</UsersColumn>
-				<SharedCanvas />
 			</div>
 		)
 	}

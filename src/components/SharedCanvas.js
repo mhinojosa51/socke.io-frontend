@@ -7,8 +7,7 @@ const styles = {
 		border: '1px solid black',
 	},
 	canvas: {
-		width: '100%',
-		height: '100%',
+		cursor: 'crosshair',
 	}
 }
 
@@ -16,17 +15,21 @@ class SharedCanvas extends React.Component {
 	constructor(props){
 		super(props);
 
+		this.canvasClick = this.canvasClick.bind(this);
 	}
 
 	componentDidMount(){
 		this.context = this.canvas.getContext('2d');
-		this.context.strokeRect(5,5,5,5);
 
-		this.context.beginPath();
-		this.context.arc(50,50,50,0,(Math.PI / 180) * 360)
-		this.context.stroke();
+	}
 
+	canvasClick(evt){
+		const rect = this.canvas.getBoundingClientRect();
 
+		const x = rect.left + evt.clientX;
+		const y = rect.top + evt.clientY;
+
+		this.context.strokeRect(x - 7.5,y - 7.5,10,10);
 	}
 
 	render(){
@@ -35,7 +38,7 @@ class SharedCanvas extends React.Component {
 		const height = window.innerHeight;
 		return (
 			<section style={styles.container}>
-				<canvas ref={(canvas) => this.canvas = canvas} width={width} height={height}>
+				<canvas ref={(canvas) => this.canvas = canvas} onClick={this.canvasClick} width={width} height={height} style={styles.canvas}>
 				</canvas>
 			</section>
 		)
