@@ -2,6 +2,7 @@ import React from 'react';
 import UsersColumn from './UsersColumn';
 import User from './User';
 import SharedCanvas from './SharedCanvas';
+import Artist from './artist/Artist';
 
 const styles = {
 	container : {
@@ -21,7 +22,7 @@ class Dashboard extends React.Component {
 			<div style={styles.container}>
 				<SharedCanvas />
 				<UsersColumn>
-					<User name="Mike" />
+					<Artist />
 				</UsersColumn>
 			</div>
 		)
