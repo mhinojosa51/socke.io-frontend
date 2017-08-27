@@ -1,14 +1,17 @@
 import React from 'react';
-import Palette from './artist/Palette';
+import UsersColumn from './UsersColumn';
+import Artist from './artist/Artist';
 
 const styles = {
 	container : {
-		width: '80%',
-		height: 'auto',
+		width: '100%',
+		height: '100%',
 		border: '1px solid black',
+		display: 'flex',
 	},
 	canvas: {
 		cursor: 'crosshair',
+		width: '80%',
 	}
 }
 
@@ -41,9 +44,9 @@ class SharedCanvas extends React.Component {
 		const rect = this.canvas.getBoundingClientRect();
 
 		const x = rect.left + evt.clientX;
-		const y = rect.top + evt.clientY - 40;
+		const y = rect.top + evt.clientY;
 
-		this.state.drawing[this.state.drawing.length - 1].push([x,y])
+		this.state.drawing[this.state.drawing.length - 1].points.push([x,y])
 /*
 		if(this.state.isDrawing){
 			this.context.beginPath();
@@ -60,7 +63,10 @@ class SharedCanvas extends React.Component {
 
 	isDrawing(){
 		if(this.state.isDrawing === false){
-			this.state.drawing.push([]);
+			this.state.drawing.push({
+				color: this.state.color,
+				points: [],
+			});
 		}
 		this.setState({
 			isDrawing : !this.state.isDrawing,
@@ -71,27 +77,30 @@ class SharedCanvas extends React.Component {
 		this.state.drawing.map((path) => {
 			this.context.beginPath();
 			this.context.lineWidth = 10;
-			path.map((vals) => {
+			path.points.map((vals) => {
 				this.context.lineTo(vals[0],vals[1]);
+				return null;
 			});
-			this.context.strokeStyle = this.state.color;
+			this.context.strokeStyle = path.color;
 			this.context.stroke();
 			this.context.closePath();
+			return null;
 		});
 	}
 
 	render(){
-		const colors = ['yellow', 'blue', 'red', 'black', 'pink', 'steelblue', 'orange'];
 
 		const width = window.innerWidth - (window.innerWidth * .20);
 		const height = window.innerHeight;
 		return (
 			<section style={styles.container}>
-				<Palette colors={colors} selectColor={this.selectColor}/>
 				<canvas ref={(canvas) => this.canvas = canvas} onClick={this.canvasClick}
 					onMouseDown={this.isDrawing} onMouseUp={() => {this.isDrawing(); this.draw()}} width={width} height={height}
 					style={styles.canvas} onMouseMove={this.state.isDrawing ? this.canvasDrag : null}>
 				</canvas>
+				<UsersColumn>
+					<Artist canvas={this.canvas} selectColor={this.selectColor}/>
+				</UsersColumn>
 			</section>
 		)
 	}

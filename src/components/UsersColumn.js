@@ -10,9 +10,6 @@ const styles = {
 }
 
 class UsersColumn extends React.Component {
-	constructor(props){
-		super(props);
-	}
 
 	render(){
 		return (
