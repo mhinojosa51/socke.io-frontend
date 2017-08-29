@@ -1,6 +1,7 @@
 import React from 'react';
 import UsersColumn from './UsersColumn';
 import Artist from './artist/Artist';
+import DrawingUtils from '../utils/DrawingUtils';
 
 const styles = {
 	container : {
@@ -23,6 +24,7 @@ class SharedCanvas extends React.Component {
 			isDrawing : false,
 			drawing : [],
 			color: 'black',
+			tool: 'circle',
 		}
 
 		this.canvasClick = this.canvasClick.bind(this);
@@ -30,10 +32,19 @@ class SharedCanvas extends React.Component {
 		this.isDrawing = this.isDrawing.bind(this);
 		this.draw = this.draw.bind(this);
 		this.selectColor = this.selectColor.bind(this);
+		this.drawCircle = this.drawCircle.bind(this);
+		this.selectTool = this.selectTool.bind(this);
+		this.DrawingUtils = new DrawingUtils();
+
+		this.prevX = 0;
+		this.prevY = 0;
+		this.currX = 0;
+		this.currY = 0;
 	}
 
 	componentDidMount(){
 		this.context = this.canvas.getContext('2d');
+		this.DrawingUtils.setCanvasAndContext(this.canvas);
 	}
 
 	selectColor(color){
@@ -42,12 +53,19 @@ class SharedCanvas extends React.Component {
 
 	canvasClick(evt){
 		const rect = this.canvas.getBoundingClientRect();
+		this.prevX = this.currX;
+		this.prevY = this.currY;
+		this.currX = rect.left + evt.clientX;
+		this.currY = rect.top + evt.clientY;
 
-		const x = rect.left + evt.clientX;
-		const y = rect.top + evt.clientY;
+		if(this.state.tool === 'circle'){
+			this.drawCircle(this.currX,this.currY,this.prevX, this.prevY,5, this.state.isDrawing)
+		}
+		else {
+			this.state.drawing[this.state.drawing.length - 1].points.push([this.currX,this.currY])
 
-		this.state.drawing[this.state.drawing.length - 1].points.push([x,y])
-/*
+		}
+/*vY,
 		if(this.state.isDrawing){
 			this.context.beginPath();
 			this.context.lineTo(x - 7.5,y - 7.5);
@@ -73,6 +91,25 @@ class SharedCanvas extends React.Component {
 		})
 	}
 
+	selectTool(tool){
+		this.setState({
+			tool,
+		})
+	}
+
+	drawCircle(x,y,pX,pY,r,drawing){
+		console.log(x-pX)
+		this.context.beginPath();
+		this.context.arc(x,y,Math.abs(x-pX),0,2 * Math.PI);
+
+		if(drawing === false){
+			this.context.stroke();
+			this.context.closePath();
+		}
+
+console.log(x,pX)
+	}
+
 	draw(){
 		this.state.drawing.map((path) => {
 			this.context.beginPath();
@@ -94,12 +131,12 @@ class SharedCanvas extends React.Component {
 		const height = window.innerHeight;
 		return (
 			<section style={styles.container}>
-				<canvas ref={(canvas) => this.canvas = canvas} onClick={this.canvasClick}
-					onMouseDown={this.isDrawing} onMouseUp={() => {this.isDrawing(); this.draw()}} width={width} height={height}
-					style={styles.canvas} onMouseMove={this.state.isDrawing ? this.canvasDrag : null}>
+				<canvas ref={(canvas) => this.canvas = canvas} width={width} height={height} style={styles.canvas}
+					onMouseDown={this.DrawingUtils ? this.DrawingUtils.onMouseDown : null} onMouseUp={this.DrawingUtils.onMouseUp}
+					onMouseMove={this.DrawingUtils.onMouseDrag}>
 				</canvas>
 				<UsersColumn>
-					<Artist canvas={this.canvas} selectColor={this.selectColor}/>
+					<Artist canvas={this.canvas} selectColor={this.selectColor} selectTool={this.selectTool}/>
 				</UsersColumn>
 			</section>
 		)

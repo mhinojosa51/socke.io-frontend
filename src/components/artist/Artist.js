@@ -1,5 +1,6 @@
 import React from 'react';
 import Palette from './Palette';
+import CircleTool from './CircleTool';
 
 const styles = {
 	container : {
@@ -19,6 +20,7 @@ class Artist extends React.Component {
 			<section style={styles.container}>
 				<h4>Michael</h4>
 				<Palette colors={colors} selectColor={this.props.selectColor}/>
+				<CircleTool selectTool={this.props.selectTool}/>
 			</section>
 		)
 	}
