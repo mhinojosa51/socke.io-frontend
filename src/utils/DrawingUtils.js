@@ -14,6 +14,7 @@ class DrawingUtils {
 		this.lines = [];
 		this.currentLine = [];
 		this.drawLine = this.drawLine.bind(this);
+		this.drawCircle = this.drawCircle.bind(this);
 	}
 
 	setCanvasAndContext(canvas){
@@ -55,29 +56,28 @@ class DrawingUtils {
 		if(this.drawMode === 'circle'){
 			let drawing = {pos,r};
 			this.drawings.push(drawing);
-		}
+		} else {
+			let drawing = {
+				points : this.currentLine,
+			};
 
-		this.lines.push(this.currentLine);
-		this.currentLine = [];
+			this.drawings.push(drawing);
+			this.currentLine = [];
+		}
 	}
 
 	recreate(){
 		for(let i = 0; i < this.drawings.length; i++){
 			let drawing = this.drawings[i];
 			this.context.beginPath();
-			this.context.arc(drawing.pos[0], drawing.pos[1], drawing.r, 0, 2 * Math.PI);
-			this.context.stroke();
-			this.context.closePath();
-		}
 
-		for(let i = 0; i < this.lines.length; i++){
-			let line = this.lines[i];
-			console.log(line);
-
-			this.context.beginPath();
-			for(let j = 0; j < line.length; j++){
-				let point = line[j];
-				this.context.lineTo(point[0], point[1]);
+			if(drawing.hasOwnProperty('r')){
+				this.context.arc(drawing.pos[0], drawing.pos[1], drawing.r, 0, 2 * Math.PI);
+			} else {
+				drawing.points.map((point) => {
+					this.context.lineTo(point[0],point[1]);
+					return null;
+				});
 			}
 			this.context.stroke();
 			this.context.closePath();
@@ -89,23 +89,34 @@ class DrawingUtils {
 		this.context.beginPath();
 		this.currentLine.map((point) => {
 			this.context.lineTo(point[0],point[1]);
+			return null;
 		});
+		this.context.stroke();
+		this.context.closePath();
+	}
+
+	drawCircle(x,y,r){
+		this.context.beginPath();
+		this.context.arc(x,y, r, 0, 2 * Math.PI);
+
 		this.context.stroke();
 		this.context.closePath();
 	}
 
 	draw(start,end){
 		let r = Math.abs(start[0] - end[0]);
+		switch(this.drawMode){
+			case 'circle':
+				this.drawCircle(start[0],start[1],r);
+				break;
 
-		if(this.drawMode === 'circle'){
-		this.context.beginPath();
-		this.context.arc(start[0], start[1], r, 0, 2 * Math.PI);
+			case 'line':
+				this.drawLine(end[0],end[1]);
+				break;
 
-		this.context.stroke();
-		this.context.closePath();
-	} else {
-		this.drawLine(end[0],end[1]);
-	}
+			default:
+				return null;
+		}
 
 		if(!this.isDrawing){
 			let pos = start;
